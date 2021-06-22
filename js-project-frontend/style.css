@@ -1,0 +1,42 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+  
+header {
+    background-color: grey;
+    margin: 0 auto;
+    height: 50px;
+}
+  
+header h2 {
+    padding: 10px;
+    margin: 0;
+}
+
+.user {
+  padding: 10px;
+  float: right
+}
+  
+main {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-gap: 20px;
+    padding-top: 10px;
+    padding-bottom: 30px;
+}
+
+
+@media only screen and (min-width: 500px) {
+    main {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+@media only screen and (min-width: 850px) {
+   main {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
