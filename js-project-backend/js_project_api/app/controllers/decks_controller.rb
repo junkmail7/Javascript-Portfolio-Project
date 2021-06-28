@@ -38,6 +38,28 @@ class DecksController < ApplicationController
     @deck.destroy
   end
 
+  def high_low
+    sorted_decks = Deck.all.sort_by{|d| d.price }
+    sorted_decks = sorted_decks.reverse
+    render json: sorted_decks
+  end 
+
+  def low_high
+    sorted_decks = Deck.all.sort_by{|d| d.price }
+    render json: sorted_decks
+  end 
+
+  def large_small
+    sorted_decks = Deck.all.sort_by{|d| d.size }
+    sorted_decks = sorted_decks.reverse
+    render json: sorted_decks
+  end 
+
+  def small_large
+    sorted_decks = Deck.all.sort_by{|d| d.size }
+    render json: sorted_decks
+  end 
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_deck
