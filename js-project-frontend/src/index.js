@@ -10,6 +10,7 @@ const input = document.querySelector(".input")
 const cartDiv = document.querySelector(".cart")
 const cartButton = document.querySelector(".viewCart")
 const checkoutButton = document.querySelector(".checkout")
+const sort = document.querySelector(".sort")
 
 //Render + SignUp + Login for User
 
@@ -27,9 +28,8 @@ signup.addEventListener('submit', function(e){
     })
     .then(res => res.json())
     .then(function(json){
-        renderUser(json)
-        }
-    )
+    renderUser(json)
+    })
 })
 
 class loggedInUser {
@@ -72,12 +72,16 @@ function renderUser(jsonObj) {
         clearCartVisuals()
     });
     userDiv.className = "user"
+
     createUsersCart(u.id)
+
     userDiv.appendChild(logoutButton)
     header.append(userDiv)
 }
 
-//Render Decks
+//Render and Sort Decks
+
+let isSorted = false
 
 document.addEventListener("DOMContentLoaded", () => {
     fetch(DECKS_URL)
@@ -86,6 +90,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function renderDecks(jsonObj) {
+    if (isSorted == true){
+        main.innerHTML=""
+    }
+    isSorted = false
+
     for (const d of jsonObj) {
         const deckDiv = document.createElement("div");
         deckDiv.id = d.id;
@@ -108,13 +117,15 @@ function renderDecks(jsonObj) {
         deckDiv.appendChild(decksizeP);
         
         const deckpriceP = document.createElement("p");
-        deckpriceP.innerHTML = "Price: $" +  d.price;
+        deckpriceP.innerHTML = "Price: $" +  (d.price);
         deckDiv.appendChild(deckpriceP);
 
         const addDecktoCartButton = document.createElement("button");
         addDecktoCartButton.innerHTML = "Add to Cart";
         addDecktoCartButton.addEventListener("click", function (e) {
             addToCart(d)
+            clearCartVisuals()
+            clicked = false
         });
         deckDiv.appendChild(addDecktoCartButton);
 
@@ -122,7 +133,14 @@ function renderDecks(jsonObj) {
     }
 }
 
-//Add Deck to Cart
+sort.addEventListener('change', function(e){
+    isSorted = true
+    fetch(BASE_URL + `/${e.target.value}`)
+    .then(res => res.json())
+    .then(json => renderDecks(json))
+})
+
+//Create, View, and Add Deck to Cart
 
 function createUsersCart(u_id)
 {
@@ -150,6 +168,7 @@ function addToCart(d)
             cart_id: loggedin.id
         })
     })
+    clearCartVisuals
 }
     
 let clicked = false
@@ -166,6 +185,7 @@ cartButton.addEventListener("click", function (e) {
     }
     else if (clicked == false) {
         clearCartVisuals()
+        t = 0
     }
 });
 
@@ -177,7 +197,7 @@ function clearCartVisuals(){
     }
 }
 
-let x = 0
+let t = 0
 
 function viewCartItems(cartItems)
 {
@@ -203,20 +223,34 @@ function viewCartItems(cartItems)
                 cart_id: ''
             })
         })
-    });
+        t = t - parseFloat(i.price)
+        total.innerHTML = "Total :$" + t.toFixed(2);
+        cartDiv.removeChild(cartItemDiv)
+    }); 
     cartItemDiv.appendChild(removeButton);
     cartDiv.appendChild(cartItemDiv);
-
-    let realnum = parseFloat(i.price)
-    x = x + realnum
+    t = t + parseFloat(i.price)
     }
     const total = document.createElement("p");
-    total.innerHTML = "Total :$" + x;
+    total.innerHTML = "Total :$" + t.toFixed(2);
     cartDiv.appendChild(total);
-}
 
-checkoutButton.addEventListener("click", function (e) {
-    //delete all decks within the cart
-});
+    checkoutButton.addEventListener("click", function (e) {
+        document.querySelector(".cart").innerHTML = "Thank you for your purchase"
+        for (const i of cartItems) {
+        fetch((DECKS_URL + "/" + i.id), {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json"
+            },
+            body: JSON.stringify({
+                cart_id: ''
+            })
+        })
+        }
+    });   
+    
+}
 
 
